@@ -1,0 +1,72 @@
+#!/usr/bin/python
+
+import sys, getopt
+
+class PyCellLength(object):
+
+	def pycellen(self,csv,output):
+		csv_list=[]
+		with open(csv) as fh:
+			for line in fh:
+				csv_list.append(line.rstrip().split(","))
+
+		initial_time=0;initial_len=0.0
+		final_list=[]
+		time_list=[];len_list=[]
+
+		for i,j in enumerate(csv_list):
+			if i==0:
+	
+				initial_time=int(j[0]); initial_len=float(j[1])
+				temp_time=int(j[0]); temp_len=float(j[1])
+
+			if not i==0:
+
+				diff1=int(j[0])-int(temp_time); diff2=float(j[1])-float(temp_len)
+
+				if diff2<0:
+
+					fi_time=int(time_list[0])-int(initial_time); fi_len=float(len_list[0])-float(initial_len)
+					final_list.append([time_list[0],len_list[0],fi_time,fi_len])
+					temp_time=j[0];temp_len=j[1]
+					time_list=[];len_list=[]
+					initial_time=int(j[0]);initial_len=float(j[1])
+
+				time_list=[];len_list=[]
+				time_list.append(str(j[0])); len_list.append(str(j[1]))
+				temp_time=j[0];temp_len=j[1]
+
+		self.writeFile(final_list,output)
+
+	def writeFile(self,final_list,output):
+		with open(output,"w") as fh:
+        		for entry in final_list:
+                		entry_string="\t".join(str(x) for x in entry)
+                		fh.write("%s\n"%entry_string)
+
+	def main(self,argv):	
+   		inputfile = ''
+   		outputfile = ''
+   		try:
+      			opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+   		except getopt.GetoptError:
+      			print 'usage: ./pycellen -i <input_file> -o <output_file>'
+      			sys.exit(2)
+   		for opt, arg in opts:
+      			if opt == '-h':
+         			print 'usage: ./pycellen -i <input_file> -o <output_file>'
+         			sys.exit()
+      			elif opt in ("-i", "--ifile"):
+         			inputfile = arg
+      			elif opt in ("-o", "--ofile"):
+         			outputfile = arg
+   			try:
+      				self.pycellen(inputfile,outputfile)
+   			except IOError:
+      				print 'usage: ./pycellen -i <input_file> -o <output_file>'
+      				sys.exit(2)
+
+if __name__ == "__main__":
+	command_line_argument_list=sys.argv[1:]
+	pycell_len_object=PyCellLength()
+	pycell_len_object.main(command_line_argument)
